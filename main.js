@@ -1,5 +1,5 @@
-function main() {
-  replacePlaceholders()
-}
+// Docs: https://github.com/google/clasp
 
- 
+function main() {
+  replacePlaceholders();
+}

@@ -1,5 +1,5 @@
 const getConstants = () => {
-  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = SpreadsheetApp.getActiveSheet();
   const cell = sheet.getActiveCell();
   const row = cell.getRow();
@@ -11,7 +11,6 @@ const getConstants = () => {
   const newFileName = sheet.getRange(row, 7).getValue();
   const reportYear = sheet.getRange(row, 8).getValue();
 
-
   return {
     spreadsheet: spreadsheet,
     sheet: sheet,
@@ -22,6 +21,7 @@ const getConstants = () => {
     reportYear: reportYear,
     resultsFolderURL: resultsFolderURL,
     courseLevelsURL: courseLevelsURL,
-    targetFolder, targetFolder
+    targetFolder,
+    targetFolder,
   };
 };

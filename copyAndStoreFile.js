@@ -3,7 +3,6 @@ function copyAndStoreFile() {
   const constants = getConstants();
 
   const sheet = constants.sheet;
-  console.log(sheet);
 
   try {
     const file = DriveApp.getFileById(templateData.reportTemplateID);

@@ -26,8 +26,6 @@ const getConstants = () => {
   };
 };
 
-
-
 function getBrandingTemplate() {
   const constants = getConstants();
   const reportTemplateArray = constants.reportTemplateURL.split("/");
@@ -41,70 +39,86 @@ function getBrandingTemplate() {
 
 function getResultsFolder() {
   const constants = getConstants();
-  const resultsFolderArray = constants.resultsFolderURL.split("/");
-  let resultsFolderID = null
+  const resultsFolderIDs = constants.resultsFolderURL.split("/").filter((item) => item.startsWith("1"));
 
   try {
-    resultsFolderID = resultsFolderArray[resultsFolderArray.length - 2];
-    SpreadsheetApp.getUi().alert(`M&E Results Folder ID for ${constants.programName} (row ${constants.row}):\n ${resultsFolderID}`);
+    const formattedStr = resultsFolderIDs.map((item, i) => `${item}\n`).join(" ");
+    SpreadsheetApp.getUi().alert(`M&E Results Folder IDs for ${constants.programName} (row ${constants.row}):\n ${formattedStr}`);
   } catch {
     SpreadsheetApp.getUi().alert(`Error: Could not extract folder ID from URL:\n ${constants.resultsFolderURL}`);
   }
 
-  return resultsFolderID;
+  return resultsFolderIDs;
 }
 
 function getTableFile() {
-  const constants = getConstants()
-  const courseLevelsFileArray = constants.courseLevelsURL.split("/")
-  let courseLevelsFileID = null
+  const constants = getConstants();
+  const courseLevelsFileArray = constants.courseLevelsURL.split("/");
+  let courseLevelsFileID = null;
 
   try {
-    courseLevelsFileID = courseLevelsFileArray[courseLevelsFileArray.length - 2]
+    courseLevelsFileID = courseLevelsFileArray[courseLevelsFileArray.length - 2];
     SpreadsheetApp.getUi().alert(`Course Levels File ID for ${constants.programName} (row ${constants.row}):\n ${courseLevelsFileID}`);
   } catch {
-    SpreadsheetApp.getUi().alert(`Error: Could not extract folder ID from URL:\n ${constants.courseLevelsURL}`)
+    SpreadsheetApp.getUi().alert(`Error: Could not extract folder ID from URL:\n ${constants.courseLevelsURL}`);
   }
 
-  return courseLevelsFileID
+  return courseLevelsFileID;
 }
 
-
 function getImageFiles() {
-  const resultsFolderID = getResultsFolder(); 
-   
-  if (!resultsFolderID) {
-    SpreadsheetApp.getUi().alert('No valid M&E folder ID found.');
+  const resultsFolderIDs = getResultsFolder(); // Assuming this returns an array of IDs
+
+  if (!resultsFolderIDs || resultsFolderIDs.length === 0) {
+    SpreadsheetApp.getUi().alert("No valid M&E folder IDs found.");
     return {};
   }
-  
-  const folder = DriveApp.getFolderById(resultsFolderID);
-  const files = folder.getFiles();
-  const fileIdMap = {};
-  
-  while (files.hasNext()) {
-    const file = files.next();
-    if (file.getMimeType() === MimeType.PNG) {
-      const fullName = file.getName();
-      const nameParts = fullName.split(' - ');
 
-      if (nameParts.length > 1) {
-        const key = `<${nameParts[0]}>`; // Add < and > around the key
-        const fileId = file.getId();
-        fileIdMap[key] = fileId;
+  const fileIdMap = {};
+
+  resultsFolderIDs.forEach((folderID) => {
+    try {
+      const folder = DriveApp.getFolderById(folderID);
+      const folderName = folder.getName();
+      const files = folder.getFiles();
+
+      while (files.hasNext()) {
+        const file = files.next();
+        if (file.getMimeType() === MimeType.PNG) {
+          const fullName = file.getName();
+          const nameParts = fullName.split(" - ");
+
+          if (nameParts.length > 1) {
+            let key;
+            if (folderName.includes("Progressive")) {
+              key = `<${nameParts[0]} - Progressive>`;
+            } else if (folderName.includes("JSS")) {
+              key = `<${nameParts[0]} - JSS>`;
+            } else if (folderName.includes("Primary")) {
+              key = `<${nameParts[0]} - Primary>`;
+            } else {
+              key = `<${nameParts[0]}>`;
+            }
+            const fileId = file.getId();
+            fileIdMap[key] = fileId;
+          }
+        }
       }
+    } catch (e) {
+      Logger.log("Error processing folder ID " + folderID + ": " + e.message);
     }
-  }
-  
+  });
+
   if (Object.keys(fileIdMap).length > 0) {
-    let alertMessage = 'Found .png files:\n';
+    let alertMessage = "Found .png files:\n";
     for (const key in fileIdMap) {
       alertMessage += `${key}: ${fileIdMap[key]}\n`;
     }
     SpreadsheetApp.getUi().alert(alertMessage);
   } else {
-    SpreadsheetApp.getUi().alert('No .png files found in the folder.');
+    SpreadsheetApp.getUi().alert("No .png files found in the folders.");
   }
-  
+
+  console.log(Object.keys(fileIdMap).length);
   return fileIdMap;
 }

@@ -1,14 +1,16 @@
 function extractLevelsInfo() {
-  const courseLevelsFileID = getTableFile(); 
+  const courseLevelsFileID = getTableFile();
+  const constants = getConstants();
+  const programAbbreviation = generateProgramAbbreviation(constants.programName);
 
   if (!courseLevelsFileID) {
-    SpreadsheetApp.getUi().alert('No Course Levels file ID found.');
+    SpreadsheetApp.getUi().alert("No Course Levels file ID found.");
     return { numeracyData: [], literacyData: [] };
   }
 
   const file = DriveApp.getFileById(courseLevelsFileID);
   const spreadsheet = SpreadsheetApp.open(file);
-  const sheet = spreadsheet.getSheetByName('Courses (Leveled)');
+  const sheet = spreadsheet.getSheetByName(`${programAbbreviation} - Courses (Leveled)`);
 
   if (!sheet) {
     SpreadsheetApp.getUi().alert('No sheet named "Courses (Leveled)" found in the Course Levels file.');
@@ -16,91 +18,142 @@ function extractLevelsInfo() {
   }
 
   const lastRow = sheet.getLastRow();
-  const range = sheet.getRange(4, 1, lastRow - 3, 3); 
+  const range = sheet.getRange(4, 1, lastRow - 3, 3);
   const data = range.getValues();
 
-  const numeracyData = [];
-  const literacyData = [];
-  const grades = new Set(); // To track unique grades
+  let numeracyData = { Primary: [], Progressive: [] };
+  let literacyData = { Primary: [], Progressive: [] };
+  const numeracyGrades = new Set();
+  const literacyGrades = new Set();
 
-  // Process data and track grades
-  data.forEach(row => {
-    const grade = row[0].toString().trim(); // Trim whitespace and convert to string
-    let subject = row[1].toString().trim(); // Trim whitespace and convert to string
-    subject = subject.replace(/\s+/g, ' '); // Replace multiple spaces with a single space
+  data.forEach((row) => {
+    let grade = row[0].toString().trim();
+    let subject = row[1].toString().trim();
+    let level = row[2].toString().trim();
+    grade = grade.replace(/\s+/g, " ");
+    subject = subject.replace(/\s+/g, " ");
+    level = level.replace(/\s+/g, " ");
 
     const formattedRow = {
       Grade: grade,
       Subject: subject,
-      Level: row[2].toString().trim()
+      Level: level,
     };
 
-    grades.add(grade); // Add grade to the set
+    const category = grade.length === 2 ? "Primary" : "Progressive";
 
-    if (subject === 'Numeracy') {
-      numeracyData.push(formattedRow);
-    } else if (
-      subject === 'Literacy Revision 1 & 2' ||
-      subject === 'Literacy [1 & 2]'
+    if (
+      subject === "Numeracy" ||
+      subject === "Mathematics 1 & 2" ||
+      subject === "Mathematics [1 & 2]" ||
+      subject === "Supplementary Numeracy" ||
+      subject === "Accelerated Maths" ||
+      subject === "Accelerated Maths [1&2]" ||
+      subject === "Supplementary Maths"
     ) {
-      literacyData.push(formattedRow);
+      numeracyGrades.add(grade);
+      numeracyData[category].push(formattedRow);
+    } else if (
+      subject === "Literacy Revision 1 & 2" ||
+      subject === "English Literacy Revision [1 & 2]" ||
+      subject === "Literacy [1 & 2]" ||
+      subject === "English Studies - Language" ||
+      subject === "English Studies - Reading 1 & 2" ||
+      subject === "English Studies - Reading [1 & 2]" ||
+      subject === "Supplementary English [1&2]"
+    ) {
+      literacyGrades.add(grade);
+      literacyData[category].push(formattedRow);
     }
   });
 
-  // Convert grades set to sorted array
-  const sortedGrades = Array.from(grades).sort((a, b) => {
-    const numA = parseInt(a.substring(1), 10);
-    const numB = parseInt(b.substring(1), 10);
-    return numA - numB;
-  });
+  // Function to determine missing grades and add them to data
+  function addMissingGrades(gradeSet, data, category) {
+    // Extract single letter grades and sort them numerically
+    const gradesArray = Array.from(gradeSet);
+    const letterGrades = {};
 
-  // Determine missing grades
-  const missingGrades = [];
-  for (let i = 0; i < sortedGrades.length - 1; i++) {
-    const currentGradeNum = parseInt(sortedGrades[i].substring(1), 10);
-    const nextGradeNum = parseInt(sortedGrades[i + 1].substring(1), 10);
+    gradesArray.forEach((grade) => {
+      const letter = grade.charAt(0);
+      const number = parseInt(grade.substring(1), 10);
 
-    // Check for missing grades between current and next
-    for (let j = currentGradeNum + 1; j < nextGradeNum; j++) {
-      const missingGrade = `G${j}`;
-      missingGrades.push(missingGrade);
-    }
+      if (!letterGrades[letter]) {
+        letterGrades[letter] = new Set();
+      }
+
+      if (!isNaN(number) && number < 10) {
+        // Only consider single-digit numbers
+        letterGrades[letter].add(number);
+      }
+    });
+
+    const missingGrades = [];
+
+    // For each letter grade, find missing grades in the range of single-digit numbers
+    Object.keys(letterGrades).forEach((letter) => {
+      const sortedNumbers = Array.from(letterGrades[letter]).sort((a, b) => a - b);
+      const lowestGrade = sortedNumbers[0];
+      const highestGrade = sortedNumbers[sortedNumbers.length - 1];
+
+      for (let i = lowestGrade; i <= highestGrade; i++) {
+        const grade = `${letter}${i}`;
+        if (!gradeSet.has(grade)) {
+          missingGrades.push(grade);
+        }
+      }
+    });
+
+    missingGrades.forEach((grade) => {
+      const placeholderRow = {
+        Grade: grade,
+        Subject: "",
+        Level: "",
+      };
+      data[category].push(placeholderRow);
+    });
   }
 
-  // Insert missing grades into literacyData or numeracyData
-  missingGrades.forEach(grade => {
-    // Default values can be adjusted as needed
-    const placeholderRow = {
-      Grade: grade,
-      Subject: 'n/a',
-      Level: 'n/a'
-    };
-    
-    if (grade.startsWith('G')) { // Example condition to add to literacyData
-      literacyData.push(placeholderRow);
-    } else {
-      numeracyData.push(placeholderRow);
-    }
-  });
+  // Add missing grades separately for Literacy and Numeracy
+  addMissingGrades(numeracyGrades, numeracyData, "Primary");
+  addMissingGrades(literacyGrades, literacyData, "Primary");
 
-  // Function to sort data by Grade
   const sortByGrade = (a, b) => {
     const numA = parseInt(a.Grade.substring(1), 10);
     const numB = parseInt(b.Grade.substring(1), 10);
     return numA - numB;
   };
 
-  // Sort both arrays by Grade
-  numeracyData.sort(sortByGrade);
-  literacyData.sort(sortByGrade);
+  const sortData = (data) => {
+    const primary = data.Primary.sort(sortByGrade);
+    const progressive = data.Progressive.sort(sortByGrade);
 
-  // Format the results as strings
-  const numeracyStr = numeracyData.map(row => `Grade: ${row.Grade}, Subject: ${row.Subject}, Level: ${row.Level}`).join('\n');
-  const literacyStr = literacyData.map(row => `Grade: ${row.Grade}, Subject: ${row.Subject}, Level: ${row.Level}`).join('\n');
+    // Further sort to ensure same grades appear together regardless of subject
+    return {
+      Primary: primary.sort((a, b) => a.Grade.localeCompare(b.Grade)),
+      Progressive: progressive.sort((a, b) => a.Grade.localeCompare(b.Grade)),
+    };
+  };
 
-  // Display results in pop-up messages
-  SpreadsheetApp.getUi().alert('Numeracy Data:\n' + numeracyStr);
-  SpreadsheetApp.getUi().alert('Literacy Data:\n' + literacyStr);
+  numeracyData = sortData(numeracyData);
+  literacyData = sortData(literacyData);
 
+  const formatData = (data) => {
+    return data.map((row) => `{ Grade: ${row.Grade}, Subject: ${row.Subject}, Level: ${row.Level} }`).join("\n");
+  };
+
+  const numeracyStrPrimary = formatData(numeracyData.Primary);
+  const numeracyStrProgressive = formatData(numeracyData.Progressive);
+  const literacyStrPrimary = formatData(literacyData.Primary);
+  const literacyStrProgressive = formatData(literacyData.Progressive);
+
+  SpreadsheetApp.getUi().alert(
+    `Literacy Data\n\nPrimary\n${literacyStrPrimary}\n\nProgressive\n${literacyStrProgressive ? literacyStrProgressive : "{ No Progressive Data Found }"}`
+  );
+  SpreadsheetApp.getUi().alert(
+    `Numeracy Data\n\nPrimary\n${numeracyStrPrimary}\n\nProgressive\n${numeracyStrProgressive ? numeracyStrProgressive : "{ No Progressive Data Found }"}`
+  );
+
+  console.log(numeracyData);
+  console.log(literacyData);
   return { numeracyData, literacyData };
 }

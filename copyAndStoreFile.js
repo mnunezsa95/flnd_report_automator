@@ -2,8 +2,6 @@ function copyAndStoreFile() {
   const templateData = getBrandingTemplate();
   const constants = getConstants();
 
-  const sheet = constants.sheet;
-
   try {
     const file = DriveApp.getFileById(templateData.reportTemplateID);
 

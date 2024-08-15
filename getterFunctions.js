@@ -67,14 +67,14 @@ function getTableFile() {
 }
 
 function getImageFiles() {
-  const resultsFolderIDs = getResultsFolder(); // Assuming this returns an array of IDs
+  const resultsFolderIDs = getResultsFolder();
+  const fileIdMap = {};
+  let numberOfFiles;
 
   if (!resultsFolderIDs || resultsFolderIDs.length === 0) {
     SpreadsheetApp.getUi().alert("No valid M&E folder IDs found.");
     return {};
   }
-
-  const fileIdMap = {};
 
   resultsFolderIDs.forEach((folderID) => {
     try {
@@ -109,8 +109,9 @@ function getImageFiles() {
     }
   });
 
+  numberOfFiles = Object.keys(fileIdMap).length;
   if (Object.keys(fileIdMap).length > 0) {
-    let alertMessage = "Found .png files:\n";
+    let alertMessage = `Found ${numberOfFiles} .png files:\n\n`;
     for (const key in fileIdMap) {
       alertMessage += `${key}: ${fileIdMap[key]}\n`;
     }
@@ -119,6 +120,5 @@ function getImageFiles() {
     SpreadsheetApp.getUi().alert("No .png files found in the folders.");
   }
 
-  console.log(Object.keys(fileIdMap).length);
   return fileIdMap;
 }

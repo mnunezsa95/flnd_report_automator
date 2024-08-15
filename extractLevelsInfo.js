@@ -40,27 +40,28 @@ function extractLevelsInfo() {
       Level: level,
     };
 
-    const category = grade.length === 2 ? "Primary" : "Progressive";
+    // Check if grade ends with two digits
+    const endsWithTwoDigits = /\d{2}$/.test(grade);
+    // Determine category based on grade length and if it ends with two digits
+    const category = grade.length === 3 && endsWithTwoDigits ? "Progressive" : "Primary";
 
     if (
       subject === "Numeracy" ||
       subject === "Mathematics 1 & 2" ||
-      subject === "Mathematics [1 & 2]" ||
       subject === "Supplementary Numeracy" ||
       subject === "Accelerated Maths" ||
-      subject === "Accelerated Maths [1&2]" ||
       subject === "Supplementary Maths"
     ) {
       numeracyGrades.add(grade);
       numeracyData[category].push(formattedRow);
     } else if (
       subject === "Literacy Revision 1 & 2" ||
-      subject === "English Literacy Revision [1 & 2]" ||
-      subject === "Literacy [1 & 2]" ||
+      subject === "Supplemental Language" ||
+      subject === "English Literacy Revision 1 & 2" ||
+      subject === "Literacy 1 & 2" ||
       subject === "English Studies - Language" ||
       subject === "English Studies - Reading 1 & 2" ||
-      subject === "English Studies - Reading [1 & 2]" ||
-      subject === "Supplementary English [1&2]"
+      subject === "Supplementary English 1 & 2"
     ) {
       literacyGrades.add(grade);
       literacyData[category].push(formattedRow);
@@ -106,8 +107,8 @@ function extractLevelsInfo() {
     missingGrades.forEach((grade) => {
       const placeholderRow = {
         Grade: grade,
-        Subject: "",
-        Level: "",
+        Subject: "-",
+        Level: "-",
       };
       data[category].push(placeholderRow);
     });
@@ -153,7 +154,5 @@ function extractLevelsInfo() {
     `Numeracy Data\n\nPrimary\n${numeracyStrPrimary}\n\nProgressive\n${numeracyStrProgressive ? numeracyStrProgressive : "{ No Progressive Data Found }"}`
   );
 
-  console.log(numeracyData);
-  console.log(literacyData);
   return { numeracyData, literacyData };
 }

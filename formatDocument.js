@@ -57,21 +57,42 @@ function formatDocument(newFileData) {
       }
     }
 
-    // Insert tables at placeholders
-    createTableAtPlaceholder(
-      body,
-      numeracyData,
-      ["Grade", "Current Years' Levels", "On-level Avg", "2025 Numeracy Level", "Repeating"],
-      true,
-      "<Numeracy Table>"
-    );
-    createTableAtPlaceholder(
-      body,
-      literacyData,
-      ["Grade", "Current Years' Levels", "On-level Avg", "2025 Lit Level", "2025 Lang", "Repeating"],
-      false,
-      "<Literacy Table>"
-    );
+    // Iterate over keys of the data object to create tables
+    for (const key in numeracyData) {
+      if (numeracyData.hasOwnProperty(key)) {
+        const data = numeracyData[key];
+        creatTable(
+          body,
+          data,
+          ["Rising Grade", "Last Year’s Levels", "On-level Item Avg (1)", "On-level Item Avg (2)", "Level to Remediate", "Proposed Level", "Custom"],
+          true,
+          `<Numeracy Table - ${key}>`
+        );
+      }
+    }
+
+    for (const key in literacyData) {
+      if (literacyData.hasOwnProperty(key)) {
+        const data = literacyData[key];
+        creatTable(
+          body,
+          data,
+          [
+            "Rising Grade",
+            "Last Year’s Reading Levels",
+            "Last Year’s Lang Levels",
+            "On-level Item Avg (1)",
+            "On-level Item Avg (2)",
+            "Level to Remediate",
+            "Proposed Reading Level",
+            "Proposed Lang Level",
+            "Custom",
+          ],
+          false,
+          `<Literacy Table - ${key}>`
+        );
+      }
+    }
   } catch (e) {
     SpreadsheetApp.getUi().alert(`Error: ${e.message}`);
     throw e;

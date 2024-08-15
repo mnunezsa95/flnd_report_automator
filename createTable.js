@@ -1,7 +1,6 @@
-// Function to create a table at a placeholder location in the document
-function createTableAtPlaceholder(body, data, headers, isNumeracy, placeholder) {
+function creatTable(body, data, headers, isNumeracy, placeholder) {
   // Define number of columns based on whether it's numeracy or literacy
-  const numColumns = isNumeracy ? 5 : 6;
+  const numColumns = isNumeracy ? 7 : 9;
 
   // Find the placeholder text
   let searchResult = body.findText(placeholder);
@@ -28,21 +27,82 @@ function createTableAtPlaceholder(body, data, headers, isNumeracy, placeholder) 
       cell.setBold(true);
     });
 
-    // Add data rows
+    const tempData = {};
+
+    // First pass: Accumulate values
     data.forEach((item) => {
+      if (isNumeracy) {
+        if (!tempData[item.Grade]) {
+          tempData[item.Grade] = {
+            Grade: item.Grade,
+            Level: item.Level || "",
+            ItemAvg1: "", // Placeholder
+            ItemAvg2: "", // Placeholder
+            RemediateLevel: "", // Placeholder
+            ProposedLevel: "", // Placeholder
+            Custom: "", // Placeholder
+          };
+        }
+      } else {
+        // Initialize or update temporary data
+        if (!tempData[item.Grade]) {
+          tempData[item.Grade] = {
+            Grade: item.Grade,
+            LastYearReadingLevel: "",
+            LastYearLangLevel: "",
+            ItemAvg1: "", // Placeholder
+            ItemAvg2: "", // Placeholder
+            RemediateLevel: "", // Placeholder
+            ProposedReadingLevel: "", // Placeholder
+            ProposedLangLevel: "", // Placeholder
+            Custom: "", // Placeholder
+          };
+        }
+
+        if (
+          item.Subject === "English Studies - Reading 1 & 2" ||
+          item.Subject === "Literacy Revision 1 & 2" ||
+          item.Subject === "Literacy 1 & 2" ||
+          item.Subject === "Supplementary English 1 & 2" ||
+          item.Subject === "English Literacy Revision 1 & 2"
+        ) {
+          tempData[item.Grade].LastYearReadingLevel = item.Level;
+        }
+
+        if (item.Subject === "English Studies - Language" || item.Subject === "Supplemental Language") {
+          tempData[item.Grade].LastYearLangLevel = item.Level;
+        }
+      }
+    });
+
+    // Convert tempData to an array
+    const processedData = Object.values(tempData);
+
+    // Debugging: log processed data to verify correctness
+    console.log("Processed Data:", processedData);
+
+    // Add data rows
+    processedData.forEach((item) => {
       const row = table.appendTableRow();
       row.appendTableCell(item.Grade || ""); // Populate "Grade" column
-      row.appendTableCell(item.Level || ""); // Populate "Previous Levels" column
 
-      // Add empty cells for other columns
-      row.appendTableCell(""); // on-level Avg
       if (isNumeracy) {
-        row.appendTableCell(""); // 2025 Numeracy Level
+        row.appendTableCell(item.Level || ""); // Populate "Last Year’s Levels" column
+        row.appendTableCell(item.ItemAvg1); // Populate "On-level Item Avg (1)"
+        row.appendTableCell(item.ItemAvg2); // Populate "On-level Item Avg (2)"
+        row.appendTableCell(item.RemediateLevel); // Populate "Level to Remediate"
+        row.appendTableCell(item.ProposedLevel); // Populate "Proposed Level"
       } else {
-        row.appendTableCell(""); // 2025 Lit Level
-        row.appendTableCell(""); // 2025 Lang
+        row.appendTableCell(item.LastYearReadingLevel); // Populate "Last Year’s Reading Levels"
+        row.appendTableCell(item.LastYearLangLevel); // Populate "Last Year’s Lang Levels"
+        row.appendTableCell(item.ItemAvg1); // Populate "On-level Item Avg (1)"
+        row.appendTableCell(item.ItemAvg2); // Populate "On-level Item Avg (2)"
+        row.appendTableCell(item.RemediateLevel); // Populate "Level to Remediate"
+        row.appendTableCell(item.ProposedReadingLevel); // Populate "Proposed Reading Level"
+        row.appendTableCell(item.ProposedLangLevel); // Populate "Proposed Lang Level"
       }
-      row.appendTableCell(""); // Repeating?
+
+      row.appendTableCell(item.Custom || ""); // Populate "Custom" column
     });
 
     const rows = table.getNumRows();
@@ -51,37 +111,10 @@ function createTableAtPlaceholder(body, data, headers, isNumeracy, placeholder) 
       const cells = row.getNumCells();
       for (let j = 0; j < cells; j++) {
         const cell = row.getCell(j);
-        cell.setFontSize(9);
+        cell.setFontSize(8);
         cell.setFontFamily("Arial");
         cell.setBold(false);
         cell.setForegroundColor("#666666");
-      }
-    }
-
-    // Apply specific colors to rows
-    const colorPatternsOne = ["#c9daf8", "#d9ead3", "#f4cccc", "#d9d2e9", "#fce5cd", "#ffd966", "#f3f3f3", "#ffffff"];
-
-    // Apply colors to the first 3 columns
-    for (let i = 0; i < 8; i++) {
-      if (i < rows - 1) {
-        const row = table.getRow(i + 1); // Skip header row
-        const color = colorPatternsOne[i];
-        for (let j = 0; j < 3; j++) {
-          row.getCell(j).setBackgroundColor(color);
-        }
-      }
-    }
-
-    const colorPatternsTwo = ["#ffffff", "#c9daf8", "#d9ead3", "#f4cccc", "#d9d2e9", "#fce5cd", "#ffd966", "#f3f3f3"];
-
-    // Apply colors to columns 4 to end
-    for (let i = 0; i < 8; i++) {
-      if (i < rows - 1) {
-        const row = table.getRow(i + 1); // Skip header row
-        const color = colorPatternsTwo[i];
-        for (let j = 3; j < numColumns; j++) {
-          row.getCell(j).setBackgroundColor(color);
-        }
       }
     }
 

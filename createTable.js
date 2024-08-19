@@ -21,7 +21,7 @@ function creatTable(body, data, headers, isNumeracy, placeholder) {
     const headerRow = table.appendTableRow();
     headers.forEach((header) => {
       const cell = headerRow.appendTableCell(header);
-      cell.setFontSize(9);
+      cell.setFontSize(8);
       cell.setFontFamily("Arial");
       cell.setBackgroundColor("#efefef");
       cell.setBold(true);

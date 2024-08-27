@@ -61,7 +61,7 @@ function formatDocument(newFileData) {
     for (const key in numeracyData) {
       if (numeracyData.hasOwnProperty(key)) {
         const data = numeracyData[key];
-        creatTable(
+        createTable(
           body,
           data,
           ["Rising Grade", "Last Year’s Levels", "On-level Item Avg (1)", "On-level Item Avg (2)", "Level to Remediate", "Proposed Level", "Custom"],
@@ -74,7 +74,7 @@ function formatDocument(newFileData) {
     for (const key in literacyData) {
       if (literacyData.hasOwnProperty(key)) {
         const data = literacyData[key];
-        creatTable(
+        createTable(
           body,
           data,
           [

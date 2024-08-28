@@ -45,7 +45,7 @@ function getResultsFolder() {
   try {
     const formattedStr = resultsFolderIDs.map((item, i) => `${item}\n`).join(" ");
     SpreadsheetApp.getUi().alert(
-      `M&E Results Folder IDs for ${constants.programName} (row ${constants.row}):\n ${formattedStr}`
+      `RME Results Folder IDs for ${constants.programName} (row ${constants.row}):\n ${formattedStr}`
     );
   } catch {
     SpreadsheetApp.getUi().alert(`Error: Could not extract folder ID from URL:\n ${constants.resultsFolderURL}`);
@@ -77,7 +77,7 @@ function getImageFiles() {
   let numberOfFiles;
 
   if (!resultsFolderIDs || resultsFolderIDs.length === 0) {
-    SpreadsheetApp.getUi().alert("No valid M&E folder IDs found.");
+    SpreadsheetApp.getUi().alert("No valid RME folder IDs found.");
     return {};
   }
 

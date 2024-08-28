@@ -64,6 +64,14 @@ function main() {
     const nextRow = reportDatabaseTab.getLastRow() + 1;
     reportDatabaseTab.getRange(nextRow, 2, 1, outputData.length).setValues([outputData]);
 
+    // Reset fields (optional)
     // resetFields(constants.sheet, constants.row, [6, 7, 8]);
+
+    // Display message to the user
+    const ui = SpreadsheetApp.getUi();
+    ui.alert(
+      `Report Executed Successfully!\n\nExecution Time: ${executionTime} milliseconds.\n\nSee additional details in the "Report_Database" Tab`,
+      ui.ButtonSet.OK
+    );
   }
 }

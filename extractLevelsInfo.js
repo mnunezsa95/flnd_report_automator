@@ -148,10 +148,14 @@ function extractLevelsInfo() {
   const literacyStrProgressive = formatData(literacyData.Progressive);
 
   SpreadsheetApp.getUi().alert(
-    `Literacy Data\n\nPrimary\n${literacyStrPrimary}\n\nProgressive\n${literacyStrProgressive ? literacyStrProgressive : "{ No Progressive Data Found }"}`
+    `Literacy Data\n\nPrimary\n${literacyStrPrimary}\n\nProgressive\n${
+      literacyStrProgressive ? literacyStrProgressive : "{ No Progressive Data Found }"
+    }`
   );
   SpreadsheetApp.getUi().alert(
-    `Numeracy Data\n\nPrimary\n${numeracyStrPrimary}\n\nProgressive\n${numeracyStrProgressive ? numeracyStrProgressive : "{ No Progressive Data Found }"}`
+    `Numeracy Data\n\nPrimary\n${numeracyStrPrimary}\n\nProgressive\n${
+      numeracyStrProgressive ? numeracyStrProgressive : "{ No Progressive Data Found }"
+    }`
   );
 
   return { numeracyData, literacyData };

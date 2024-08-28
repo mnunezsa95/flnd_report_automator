@@ -21,8 +21,7 @@ const getConstants = () => {
     reportYear: reportYear,
     resultsFolderURL: resultsFolderURL,
     courseLevelsURL: courseLevelsURL,
-    targetFolder,
-    targetFolder,
+    targetFolder: targetFolder,
   };
 };
 
@@ -30,7 +29,9 @@ function getBrandingTemplate() {
   const constants = getConstants();
   const reportTemplateArray = constants.reportTemplateURL.split("/");
   const reportTemplateID = reportTemplateArray[reportTemplateArray.length - 2];
-  SpreadsheetApp.getUi().alert(`Report Template ID for ${constants.programName} (row ${constants.row}):\n ${reportTemplateID}`);
+  SpreadsheetApp.getUi().alert(
+    `Report Template ID for ${constants.programName} (row ${constants.row}):\n ${reportTemplateID}`
+  );
 
   return {
     reportTemplateID: reportTemplateID,
@@ -43,7 +44,9 @@ function getResultsFolder() {
 
   try {
     const formattedStr = resultsFolderIDs.map((item, i) => `${item}\n`).join(" ");
-    SpreadsheetApp.getUi().alert(`M&E Results Folder IDs for ${constants.programName} (row ${constants.row}):\n ${formattedStr}`);
+    SpreadsheetApp.getUi().alert(
+      `M&E Results Folder IDs for ${constants.programName} (row ${constants.row}):\n ${formattedStr}`
+    );
   } catch {
     SpreadsheetApp.getUi().alert(`Error: Could not extract folder ID from URL:\n ${constants.resultsFolderURL}`);
   }
@@ -58,7 +61,9 @@ function getTableFile() {
 
   try {
     courseLevelsFileID = courseLevelsFileArray[courseLevelsFileArray.length - 2];
-    SpreadsheetApp.getUi().alert(`Course Levels File ID for ${constants.programName} (row ${constants.row}):\n ${courseLevelsFileID}`);
+    SpreadsheetApp.getUi().alert(
+      `Course Levels File ID for ${constants.programName} (row ${constants.row}):\n ${courseLevelsFileID}`
+    );
   } catch {
     SpreadsheetApp.getUi().alert(`Error: Could not extract folder ID from URL:\n ${constants.courseLevelsURL}`);
   }

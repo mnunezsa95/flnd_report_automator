@@ -8,7 +8,16 @@ function main() {
   const startTime = new Date().getTime();
   const reportDatabaseTab = constants.spreadsheet.getSheetByName("Report_Database");
 
-  const defaultOutputData = [newFileData.uniqueReportId, constants.programName, "N/A", "N/A", "N/A", "N/A", "N/A"];
+  const defaultOutputData = [
+    newFileData.uniqueReportId,
+    constants.programName,
+    constants.newFileName,
+    "N/A",
+    "N/A",
+    "N/A",
+    "N/A",
+    "N/A",
+  ];
 
   let outputData = [...defaultOutputData]; // Initialize with default values
   let executionTime;
@@ -35,22 +44,22 @@ function main() {
     const nameParts = emailParts.split("."); // Split by '.'
     const formattedName = nameParts.map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join(" ");
 
-    outputData[2] = currentDate;
-    outputData[4] = formattedName;
-    outputData[5] = currentUserEmail;
+    outputData[3] = currentDate;
+    outputData[5] = formattedName;
+    outputData[6] = currentUserEmail;
 
     // Set the hyperlink formula
-    outputData[6] = `=HYPERLINK("${newFileUrl}", "Link")`;
+    outputData[7] = `=HYPERLINK("${newFileUrl}", "Link")`;
 
     // Call formatDocument and ensure it doesn't throw an error
     formatDocument(newFileData);
   } catch (err) {
     console.log(err);
-    outputData[2] = "Report Creation Failed";
-    outputData[6] = "N/A";
+    outputData[3] = "Report Creation Failed";
+    outputData[7] = "N/A";
   } finally {
     executionTime = new Date().getTime() - startTime;
-    outputData[3] = executionTime;
+    outputData[4] = executionTime;
 
     const nextRow = reportDatabaseTab.getLastRow() + 1;
     reportDatabaseTab.getRange(nextRow, 2, 1, outputData.length).setValues([outputData]);

@@ -19,7 +19,9 @@ function copyAndStoreFile() {
 
     const uniqueReportId = generateUniqueID();
 
-    SpreadsheetApp.getUi().alert(`File copied and stored successfully as ${constants.newFileName}.\nReport ID: ${uniqueReportId}.`);
+    SpreadsheetApp.getUi().alert(
+      `File copied and stored successfully as ${constants.newFileName}.\nReport ID: ${uniqueReportId}.`
+    );
 
     return {
       newFileID: newFileID,

@@ -64,7 +64,15 @@ function formatDocument(newFileData) {
         createTable(
           body,
           data,
-          ["Rising Grade", "Last Year’s Levels", "On-level Item Avg (1)", "On-level Item Avg (2)", "Level to Remediate", "Proposed Level", "Custom"],
+          [
+            "Rising Grade",
+            "Last Year’s Levels",
+            "On-level Item Avg (1)",
+            "On-level Item Avg (2)",
+            "Level to Remediate",
+            "Proposed Level",
+            "Custom",
+          ],
           true,
           `<Numeracy Table - ${key}>`
         );
@@ -86,7 +94,7 @@ function formatDocument(newFileData) {
             "Level to Remediate",
             "Proposed Reading Level",
             "Proposed Lang Level",
-            "Custom",
+            "Custom (Language)",
           ],
           false,
           `<Literacy Table - ${key}>`

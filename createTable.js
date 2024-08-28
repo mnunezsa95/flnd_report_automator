@@ -81,11 +81,98 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
       row.appendTableCell(item.Grade || "");
 
       if (isNumeracy) {
-        row.appendTableCell(item.Level || "");
+        const lastYearMathCell = row.appendTableCell(item.Level);
         row.appendTableCell(item.ItemAvg1);
         row.appendTableCell(item.ItemAvg2);
         row.appendTableCell(item.RemediateLevel);
         row.appendTableCell(item.ProposedLevel);
+
+        // Apply conditional formatting for math levels
+        const mathColors = {
+          2: {
+            A: LIGHT_YELLOW,
+            AA: LIGHT_YELLOW,
+            AB: GREEN,
+            B: GREEN,
+            BB: GREEN,
+          },
+          3: {
+            A: YELLOW,
+            AA: YELLOW,
+            AB: LIGHT_YELLOW,
+            B: LIGHT_YELLOW,
+            BB: LIGHT_YELLOW,
+            BC: GREEN,
+            C: GREEN,
+            CC: GREEN,
+          },
+          4: {
+            A: ORANGE,
+            AA: ORANGE,
+            AB: YELLOW,
+            B: YELLOW,
+            BB: YELLOW,
+            BC: LIGHT_YELLOW,
+            C: LIGHT_YELLOW,
+            CC: LIGHT_YELLOW,
+            CD: GREEN,
+            D: GREEN,
+            DD: GREEN,
+          },
+          5: {
+            A: RED,
+            AA: RED,
+            AB: ORANGE,
+            B: ORANGE,
+            BB: ORANGE,
+            BC: YELLOW,
+            C: YELLOW,
+            CC: YELLOW,
+            CD: LIGHT_YELLOW,
+            D: LIGHT_YELLOW,
+            DD: LIGHT_YELLOW,
+            DE: GREEN,
+            E: GREEN,
+            EE: GREEN,
+          },
+          6: {
+            A: RED,
+            AA: RED,
+            AB: ORANGE,
+            B: ORANGE,
+            BB: ORANGE,
+            BC: YELLOW,
+            C: YELLOW,
+            CC: YELLOW,
+            CD: LIGHT_YELLOW,
+            D: LIGHT_YELLOW,
+            DD: LIGHT_YELLOW,
+            DE: GREEN,
+            E: GREEN,
+            EE: GREEN,
+          },
+        };
+
+        const gradeSuffixMatch = item.Grade.match(/\d+/);
+        const gradeSuffix = gradeSuffixMatch ? gradeSuffixMatch[0] : null;
+        const mathLevel = item.Level;
+
+        if (gradeSuffix) {
+          if (mathColors[gradeSuffix]) {
+            const color =
+              mathColors[gradeSuffix][mathLevel] ||
+              (mathLevel.includes("A") && mathLevel.includes("B") && mathColors[gradeSuffix]["AB"]) ||
+              (mathLevel.includes("B") && mathLevel.includes("C") && mathColors[gradeSuffix]["BC"]) ||
+              (mathLevel.includes("C") && mathLevel.includes("D") && mathColors[gradeSuffix]["CD"]) ||
+              (mathLevel.includes("D") && mathLevel.includes("E") && mathColors[gradeSuffix]["DE"]) ||
+              (mathLevel.includes("A") && mathColors[gradeSuffix]["AA"]) ||
+              (mathLevel.includes("B") && mathColors[gradeSuffix]["BB"]) ||
+              (mathLevel.includes("C") && mathColors[gradeSuffix]["CC"]) ||
+              (mathLevel.includes("D") && mathColors[gradeSuffix]["DD"]) ||
+              (mathLevel.includes("E") && mathColors[gradeSuffix]["EE"]);
+            if (color) lastYearMathCell.setBackgroundColor(color);
+          }
+        }
       } else {
         const lastYearReadingCell = row.appendTableCell(item.LastYearReadingLevel);
         row.appendTableCell(item.LastYearLangLevel);
@@ -128,47 +215,58 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
             DD: GREEN,
           },
           5: {
-            A: ORANGE,
-            AA: ORANGE,
-            AB: YELLOW,
-            B: YELLOW,
-            BB: YELLOW,
-            BC: LIGHT_YELLOW,
-            C: LIGHT_YELLOW,
-            CC: LIGHT_YELLOW,
-            CD: GREEN,
-            D: GREEN,
-            DD: GREEN,
+            A: RED,
+            AA: RED,
+            AB: ORANGE,
+            B: ORANGE,
+            BB: ORANGE,
+            BC: YELLOW,
+            C: YELLOW,
+            CC: YELLOW,
+            CD: LIGHT_YELLOW,
+            D: LIGHT_YELLOW,
+            DD: LIGHT_YELLOW,
+            DE: GREEN,
+            E: GREEN,
+            EE: GREEN,
           },
           6: {
-            A: ORANGE,
-            AA: ORANGE,
-            AB: YELLOW,
-            B: YELLOW,
-            BB: YELLOW,
-            BC: LIGHT_YELLOW,
-            C: LIGHT_YELLOW,
-            CC: LIGHT_YELLOW,
-            CD: GREEN,
-            D: GREEN,
-            DD: GREEN,
+            A: RED,
+            AA: RED,
+            AB: ORANGE,
+            B: ORANGE,
+            BB: ORANGE,
+            BC: YELLOW,
+            C: YELLOW,
+            CC: YELLOW,
+            CD: LIGHT_YELLOW,
+            D: LIGHT_YELLOW,
+            DD: LIGHT_YELLOW,
+            DE: GREEN,
+            E: GREEN,
+            EE: GREEN,
           },
         };
 
-        const gradeSuffix = item.Grade.slice(-1);
+        const gradeSuffixMatch = item.Grade.match(/\d+/);
+        const gradeSuffix = gradeSuffixMatch ? gradeSuffixMatch[0] : null;
         const readingLevel = item.LastYearReadingLevel;
 
-        if (readingColors[gradeSuffix]) {
-          const color =
-            readingColors[gradeSuffix][readingLevel] ||
-            (readingLevel.includes("A") && readingLevel.includes("B") && readingColors[gradeSuffix]["AB"]) ||
-            (readingLevel.includes("B") && readingLevel.includes("C") && readingColors[gradeSuffix]["BC"]) ||
-            (readingLevel.includes("C") && readingLevel.includes("D") && readingColors[gradeSuffix]["CD"]) ||
-            (readingLevel.includes("A") && readingColors[gradeSuffix]["AA"]) ||
-            (readingLevel.includes("B") && readingColors[gradeSuffix]["BB"]) ||
-            (readingLevel.includes("C") && readingColors[gradeSuffix]["CC"]) ||
-            (readingLevel.includes("D") && readingColors[gradeSuffix]["DD"]);
-          if (color) lastYearReadingCell.setBackgroundColor(color);
+        if (gradeSuffix) {
+          if (readingColors[gradeSuffix]) {
+            const color =
+              readingColors[gradeSuffix][readingLevel] ||
+              (readingLevel.includes("A") && readingLevel.includes("B") && readingColors[gradeSuffix]["AB"]) ||
+              (readingLevel.includes("B") && readingLevel.includes("C") && readingColors[gradeSuffix]["BC"]) ||
+              (readingLevel.includes("C") && readingLevel.includes("D") && readingColors[gradeSuffix]["CD"]) ||
+              (readingLevel.includes("D") && readingLevel.includes("E") && readingColors[gradeSuffix]["DE"]) ||
+              (readingLevel.includes("A") && readingColors[gradeSuffix]["AA"]) ||
+              (readingLevel.includes("B") && readingColors[gradeSuffix]["BB"]) ||
+              (readingLevel.includes("C") && readingColors[gradeSuffix]["CC"]) ||
+              (readingLevel.includes("D") && readingColors[gradeSuffix]["DD"]) ||
+              (readingLevel.includes("E") && readingColors[gradeSuffix]["EE"]);
+            if (color) lastYearReadingCell.setBackgroundColor(color);
+          }
         }
       }
 

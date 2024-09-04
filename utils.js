@@ -14,6 +14,14 @@ function resetFields(sheet, row, locs) {
   }
 }
 
+const sendEmail = (recipientList, subjectLine, message) => {
+  const recipients = recipientList.length > 1 ? recipientList.join(",") : "marlon.nunez@newglobe.education";
+  const subject = subjectLine;
+  const body = message;
+
+  GmailApp.sendEmail(recipients, subject, body);
+};
+
 function generateProgramAbbreviation(programName) {
   let programAbbreviation;
   if (programName === "BayelsaPRIME") {

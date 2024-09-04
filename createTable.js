@@ -211,7 +211,7 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
         }
       } else {
         const lastYearReadingCell = row.appendTableCell(item.LastYearReadingLevel);
-        row.appendTableCell(item.LastYearLangLevel);
+        const lastYearLangCell = row.appendTableCell(item.LastYearLangLevel);
         row.appendTableCell(item.ItemAvg1);
         row.appendTableCell(item.ItemAvg2);
         row.appendTableCell(item.RemediateLevel);
@@ -337,7 +337,10 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
               (readingLevel.includes("C") && readingColors[gradeSuffix]["CC"]) ||
               (readingLevel.includes("D") && readingColors[gradeSuffix]["DD"]) ||
               (readingLevel.includes("E") && readingColors[gradeSuffix]["EE"]);
-            if (color) lastYearReadingCell.setBackgroundColor(color);
+            if (color) {
+              lastYearReadingCell.setBackgroundColor(color);
+              lastYearLangCell.setBackgroundColor(color);
+            }
           }
         }
       }

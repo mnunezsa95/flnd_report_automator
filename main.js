@@ -4,6 +4,15 @@ function main() {
   const constants = getConstants();
   const newFileData = copyAndStoreFile();
   const newFileUrl = newFileData.newFileUrl;
+  const ui = SpreadsheetApp.getUi();
+
+  const projectDirectorEmail = "marlon.nunez@newglobe.education";
+  const currentUserEmail = Session.getActiveUser().getEmail();
+  const emailParts = currentUserEmail.split("@")[0];
+  const nameParts = emailParts.split(".");
+  const formattedName = nameParts.map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join(" ");
+
+  const recipientsList = [currentUserEmail, projectDirectorEmail];
 
   const startTime = new Date().getTime();
   const reportDatabaseTab = constants.spreadsheet.getSheetByName("Report_Database");
@@ -19,7 +28,7 @@ function main() {
     "N/A",
   ];
 
-  let outputData = [...defaultOutputData]; // Initialize with default values
+  let outputData = [...defaultOutputData];
   let executionTime;
   let currentDate;
 
@@ -37,26 +46,32 @@ function main() {
       second: "2-digit",
     });
 
-    // Extract the email from the session
-    const currentUserEmail = Session.getActiveUser().getEmail();
-
-    const emailParts = currentUserEmail.split("@")[0]; // Get the part before '@'
-    const nameParts = emailParts.split("."); // Split by '.'
-    const formattedName = nameParts.map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join(" ");
-
     outputData[3] = currentDate;
     outputData[5] = formattedName;
     outputData[6] = currentUserEmail;
-
-    // Set the hyperlink formula
     outputData[7] = `=HYPERLINK("${newFileUrl}", "Link")`;
 
-    // Call formatDocument and ensure it doesn't throw an error
     formatDocument(newFileData);
+
+    ui.alert(
+      `Report Creation Successful!\n\nExecution Time: ${executionTime} milliseconds.\n\nSee additional details in the "Report_Database" Tab`,
+      ui.ButtonSet.OK
+    );
   } catch (err) {
-    console.log(err);
     outputData[3] = "Report Creation Failed";
     outputData[7] = "N/A";
+
+    const errorEmailSubject = `Report Creation Unsuccessful`;
+    const errorEmailBody = `
+      An error occurred when creating an FLND Report.\n
+      Program Name: ${constants.programName}.
+      Executed By: ${formattedName}
+      Report Name: ${constants.newFileName}
+      Report ID: ${newFileData.uniqueReportId}
+      Error Message: ${err}.`;
+
+    sendEmail(recipientsList, errorEmailSubject, errorEmailBody);
+    ui.alert(`Report Creation Unsuccessful!\n\nSee additional details in email sent to your inbox.`, ui.ButtonSet.OK);
   } finally {
     executionTime = new Date().getTime() - startTime;
     outputData[4] = executionTime;
@@ -66,12 +81,5 @@ function main() {
 
     // Reset fields (optional)
     // resetFields(constants.sheet, constants.row, [6, 7, 8]);
-
-    // Display message to the user
-    const ui = SpreadsheetApp.getUi();
-    ui.alert(
-      `Report Executed Successfully!\n\nExecution Time: ${executionTime} milliseconds.\n\nSee additional details in the "Report_Database" Tab`,
-      ui.ButtonSet.OK
-    );
   }
 }

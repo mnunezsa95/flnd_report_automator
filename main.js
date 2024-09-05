@@ -33,7 +33,6 @@ function main() {
   let currentDate;
 
   try {
-    // Get the current date and time in a readable format
     currentDate = new Date().toLocaleString("en-US", {
       weekday: "short",
       year: "numeric",
@@ -52,6 +51,7 @@ function main() {
     outputData[7] = `=HYPERLINK("${newFileUrl}", "Link")`;
 
     formatDocument(newFileData);
+    executionTime = new Date().getTime() - startTime;
 
     ui.alert(
       `Report Creation Successful!\n\nExecution Time: ${executionTime} milliseconds.\n\nSee additional details in the "Report_Database" Tab`,
@@ -73,7 +73,6 @@ function main() {
     sendEmail(recipientsList, errorEmailSubject, errorEmailBody);
     ui.alert(`Report Creation Unsuccessful!\n\nSee additional details in email sent to your inbox.`, ui.ButtonSet.OK);
   } finally {
-    executionTime = new Date().getTime() - startTime;
     outputData[4] = executionTime;
 
     const nextRow = reportDatabaseTab.getLastRow() + 1;

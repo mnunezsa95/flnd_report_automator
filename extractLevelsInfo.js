@@ -167,6 +167,5 @@ function extractLevelsInfo() {
     }`
   );
 
-  console.log(literacyData);
   return { numeracyData, literacyData };
 }

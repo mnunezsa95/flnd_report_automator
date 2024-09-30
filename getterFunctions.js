@@ -8,8 +8,9 @@ const getConstants = () => {
   const reportTemplateURL = sheet.getRange(row, 4).getValue();
   const courseLevelsURL = sheet.getRange(row, 5).getValue();
   const resultsFolderURL = sheet.getRange(row, 6).getValue();
-  const newFileName = sheet.getRange(row, 7).getValue();
-  const reportYear = sheet.getRange(row, 8).getValue();
+  const rmeScoresURL = sheet.getRange(row, 7).getValue();
+  const newFileName = sheet.getRange(row, 8).getValue();
+  const reportYear = sheet.getRange(row, 9).getValue();
 
   return {
     spreadsheet: spreadsheet,
@@ -20,6 +21,7 @@ const getConstants = () => {
     newFileName: newFileName,
     reportYear: reportYear,
     resultsFolderURL: resultsFolderURL,
+    rmeScoresURL: rmeScoresURL,
     courseLevelsURL: courseLevelsURL,
     targetFolder: targetFolder,
   };

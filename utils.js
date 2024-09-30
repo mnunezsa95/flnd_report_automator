@@ -10,7 +10,7 @@ function generateUniqueID() {
 
 function resetFields(sheet, row, locs) {
   for (let i = 0; i < locs.length; i++) {
-    sheet.getRange(row, locs[i]).setValue(""); // Set the value of the specified cell to an empty string
+    sheet.getRange(row, locs[i]).setValue("");
   }
 }
 
@@ -53,4 +53,17 @@ function generateProgramAbbreviation(programName) {
   }
 
   return programAbbreviation;
+}
+
+function convertGradeToShort(grade, mapping) {
+  const regex = /(Primary|Class|Standard|Grade) (\d+)/;
+  const match = grade.match(regex);
+
+  if (match) {
+    const prefix = mapping[match[1]];
+    const number = match[2];
+    return prefix + number;
+  }
+
+  return grade;
 }

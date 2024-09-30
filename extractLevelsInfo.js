@@ -40,9 +40,7 @@ function extractLevelsInfo() {
       Level: level,
     };
 
-    // Check if grade ends with two digits
     const endsWithTwoDigits = /\d{2}$/.test(grade);
-    // Determine category based on grade length and if it ends with two digits
     const category = grade.length === 3 && endsWithTwoDigits ? "Progressive" : "Primary";
 
     if (
@@ -52,8 +50,10 @@ function extractLevelsInfo() {
       subject === "Accelerated Maths" ||
       subject === "Supplementary Maths"
     ) {
-      numeracyGrades.add(grade);
-      numeracyData[category].push(formattedRow);
+      if (!numeracyGrades.has(grade)) {
+        numeracyGrades.add(grade);
+        numeracyData[category].push(formattedRow);
+      }
     } else if (
       subject === "Literacy Revision 1 & 2" ||
       subject === "Supplemental Language" ||
@@ -63,60 +63,72 @@ function extractLevelsInfo() {
       subject === "English Studies - Reading 1 & 2" ||
       subject === "Supplementary English 1 & 2"
     ) {
-      literacyGrades.add(grade);
-      literacyData[category].push(formattedRow);
+      if (!literacyGrades.has(grade)) {
+        literacyGrades.add(grade);
+        literacyData[category].push(formattedRow);
+      }
     }
   });
 
-  // Function to determine missing grades and add them to data
-  function addMissingGrades(gradeSet, data, category) {
-    // Extract single letter grades and sort them numerically
-    const gradesArray = Array.from(gradeSet);
-    const letterGrades = {};
+  // Modify the score extraction logic
+  function getScores(levels, scoresData, typeOfProgram) {
+    const scores = {};
 
-    gradesArray.forEach((grade) => {
-      const letter = grade.charAt(0);
-      const number = parseInt(grade.substring(1), 10);
+    levels.forEach(({ Grade, Level }) => {
+      const [levelStart, levelEnd] = Level.split("-").map((l) => l.replace(/[0-9]/g, "").trim()); // Extract letters, removing digits
 
-      if (!letterGrades[letter]) {
-        letterGrades[letter] = new Set();
+      // Treat levels as per the specifications
+      let levelKeys = [];
+      levelKeys.push(levelStart); // Always include the starting level
+      if (levelEnd) {
+        levelKeys.push(levelEnd); // Include the ending level if exists
       }
 
-      if (!isNaN(number) && number < 10) {
-        // Only consider single-digit numbers
-        letterGrades[letter].add(number);
-      }
-    });
-
-    const missingGrades = [];
-
-    // For each letter grade, find missing grades in the range of single-digit numbers
-    Object.keys(letterGrades).forEach((letter) => {
-      const sortedNumbers = Array.from(letterGrades[letter]).sort((a, b) => a - b);
-      const lowestGrade = sortedNumbers[0];
-      const highestGrade = sortedNumbers[sortedNumbers.length - 1];
-
-      for (let i = lowestGrade; i <= highestGrade; i++) {
-        const grade = `${letter}${i}`;
-        if (!gradeSet.has(grade)) {
-          missingGrades.push(grade);
-        }
-      }
-    });
-
-    missingGrades.forEach((grade) => {
-      const placeholderRow = {
-        Grade: grade,
-        Subject: "-",
-        Level: "-",
+      // Fetch scores for each key, prioritizing existing scores
+      scores[Grade] = {
+        avgOne: scoresData[typeOfProgram][Grade]?.[levelKeys[0]] || "", // First level score
+        avgTwo:
+          levelKeys[1] && levelKeys[1] !== levelKeys[0] ? scoresData[typeOfProgram][Grade]?.[levelKeys[1]] || "" : "",
       };
-      data[category].push(placeholderRow);
+
+      // Replace any undefined values with empty strings
+      scores[Grade].avgOne = scores[Grade].avgOne === undefined ? "" : scores[Grade].avgOne;
+      scores[Grade].avgTwo = scores[Grade].avgTwo === undefined ? "" : scores[Grade].avgTwo;
     });
+
+    return scores;
   }
 
-  // Add missing grades separately for Literacy and Numeracy
-  addMissingGrades(numeracyGrades, numeracyData, "Primary");
-  addMissingGrades(literacyGrades, literacyData, "Primary");
+  // Call to extractLevelScores() to get the scores
+  const { numeracy, literacy } = extractLevelScores();
+
+  numeracyData.Primary.forEach((row) => {
+    const { Grade } = row;
+    const scoreData = getScores([row], numeracy, "Primary");
+    row.avgOne = scoreData[Grade].avgOne;
+    row.avgTwo = scoreData[Grade].avgTwo;
+  });
+
+  literacyData.Primary.forEach((row) => {
+    const { Grade } = row;
+    const scoreData = getScores([row], literacy, "Primary");
+    row.avgOne = scoreData[Grade].avgOne;
+    row.avgTwo = scoreData[Grade].avgTwo;
+  });
+
+  numeracyData.Progressive.forEach((row) => {
+    const { Grade } = row;
+    const scoreData = getScores([row], numeracy, "Progressive");
+    row.avgOne = scoreData[Grade].avgOne;
+    row.avgTwo = scoreData[Grade].avgTwo;
+  });
+
+  literacyData.Progressive.forEach((row) => {
+    const { Grade } = row;
+    const scoreData = getScores([row], literacy, "Progressive");
+    row.avgOne = scoreData[Grade].avgOne;
+    row.avgTwo = scoreData[Grade].avgTwo;
+  });
 
   const sortByGrade = (a, b) => {
     const numA = parseInt(a.Grade.substring(1), 10);
@@ -125,13 +137,9 @@ function extractLevelsInfo() {
   };
 
   const sortData = (data) => {
-    const primary = data.Primary.sort(sortByGrade);
-    const progressive = data.Progressive.sort(sortByGrade);
-
-    // Further sort to ensure same grades appear together regardless of subject
     return {
-      Primary: primary.sort((a, b) => a.Grade.localeCompare(b.Grade)),
-      Progressive: progressive.sort((a, b) => a.Grade.localeCompare(b.Grade)),
+      Primary: data.Primary.sort(sortByGrade),
+      Progressive: data.Progressive.sort(sortByGrade),
     };
   };
 
@@ -139,7 +147,12 @@ function extractLevelsInfo() {
   literacyData = sortData(literacyData);
 
   const formatData = (data) => {
-    return data.map((row) => `{ Grade: ${row.Grade}, Subject: ${row.Subject}, Level: ${row.Level} }`).join("\n");
+    return data
+      .map(
+        (row) =>
+          `Grade: ${row.Grade}, Subject: ${row.Subject}, Level: ${row.Level}, avgOne: ${row.avgOne}, avgTwo: ${row.avgTwo}`
+      )
+      .join("\n");
   };
 
   const numeracyStrPrimary = formatData(numeracyData.Primary);

@@ -50,10 +50,8 @@ function extractLevelsInfo() {
       subject === "Accelerated Maths" ||
       subject === "Supplementary Maths"
     ) {
-      if (!numeracyGrades.has(grade)) {
-        numeracyGrades.add(grade);
-        numeracyData[category].push(formattedRow);
-      }
+      numeracyGrades.add(grade);
+      numeracyData[category].push(formattedRow);
     } else if (
       subject === "Literacy Revision 1 & 2" ||
       subject === "Supplemental Language" ||
@@ -63,10 +61,8 @@ function extractLevelsInfo() {
       subject === "English Studies - Reading 1 & 2" ||
       subject === "Supplementary English 1 & 2"
     ) {
-      if (!literacyGrades.has(grade)) {
-        literacyGrades.add(grade);
-        literacyData[category].push(formattedRow);
-      }
+      literacyGrades.add(grade);
+      literacyData[category].push(formattedRow);
     }
   });
 
@@ -75,7 +71,7 @@ function extractLevelsInfo() {
     const scores = {};
 
     levels.forEach(({ Grade, Level }) => {
-      const [levelStart, levelEnd] = Level.split("-").map((l) => l.replace(/[0-9]/g, "").trim()); // Extract letters, removing digits
+      const [levelStart, levelEnd] = Level.split("-").map((l) => l.replace(/[0-9]/g, "").trim());
 
       // Treat levels as per the specifications
       let levelKeys = [];
@@ -150,7 +146,7 @@ function extractLevelsInfo() {
     return data
       .map(
         (row) =>
-          `Grade: ${row.Grade}, Subject: ${row.Subject}, Level: ${row.Level}, avgOne: ${row.avgOne}, avgTwo: ${row.avgTwo}`
+          `{ Gr: ${row.Grade}, Sub: ${row.Subject}, Lvl: ${row.Level}, avg1: ${row.avgOne}, avg2: ${row.avgTwo} }`
       )
       .join("\n");
   };
@@ -171,5 +167,6 @@ function extractLevelsInfo() {
     }`
   );
 
+  console.log(literacyData);
   return { numeracyData, literacyData };
 }

@@ -54,9 +54,6 @@ function extractLevelScores() {
     }
   }
 
-  // Log the resulting objects
-  console.log(JSON.stringify(numeracy, null, 2));
-
   // Return both literacy and numeracy objects
   return { literacy, numeracy };
 }

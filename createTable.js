@@ -1,8 +1,6 @@
 function createTable(body, data, headers, isNumeracy, placeholder) {
-  // Define number of columns based on whether it's numeracy or literacy
   const numColumns = isNumeracy ? 7 : 9;
 
-  // Define constants for styling
   const GREEN = "#d9ead3";
   const LIGHT_YELLOW = "#fff2cc";
   const YELLOW = "#ffd966";
@@ -13,7 +11,6 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
   const HEADER_BG_COLOR = "#efefef";
   const FONT_COLOR = "#666666";
 
-  // Find the placeholder text in the document
   let searchResult = body.findText(placeholder);
 
   while (searchResult) {
@@ -23,10 +20,8 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
     const parent = element.getParent();
     const index = body.getChildIndex(parent);
 
-    // Insert the table after the placeholder text
     const table = body.insertTable(index + 1);
 
-    // Add header row to the table
     const headerRow = table.appendTableRow();
     headers.forEach((header) => {
       const cell = headerRow.appendTableCell(header);
@@ -41,11 +36,11 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
         tempData[item.Grade] = {
           Grade: item.Grade,
           Level: item.Level || "",
-          ItemAvg1: "", // Placeholder
-          ItemAvg2: "", // Placeholder
-          RemediateLevel: "", // Placeholder
-          ProposedLevel: "", // Placeholder
-          Custom: "", // Placeholder
+          ItemAvg1: item.avgOne ? item.avgOne + "%" : "",
+          ItemAvg2: item.avgTwo ? item.avgTwo + "%" : "",
+          RemediateLevel: "",
+          ProposedLevel: "",
+          Custom: "",
           LastYearReadingLevel: "",
           LastYearLangLevel: "",
           ProposedReadingLevel: "",
@@ -53,8 +48,15 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
         };
       }
 
+      if (item.avgOne && !tempData[item.Grade].ItemAvg1) {
+        tempData[item.Grade].ItemAvg1 = item.avgOne + "%";
+      }
+
+      if (item.avgTwo && !tempData[item.Grade].ItemAvg2) {
+        tempData[item.Grade].ItemAvg2 = item.avgTwo + "%";
+      }
+
       if (!isNumeracy) {
-        // Literacy specific data accumulation
         if (
           [
             "English Studies - Reading 1 & 2",
@@ -72,10 +74,8 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
       }
     });
 
-    // Convert accumulated data into an array
     const processedData = Object.values(tempData);
 
-    // Add data rows to the table
     processedData.forEach((item) => {
       const row = table.appendTableRow();
       row.appendTableCell(item.Grade || "");

@@ -75,9 +75,9 @@ function extractLevelsInfo() {
 
       // Treat levels as per the specifications
       let levelKeys = [];
-      levelKeys.push(levelStart); // Always include the starting level
+      levelKeys.push(levelStart);
       if (levelEnd) {
-        levelKeys.push(levelEnd); // Include the ending level if exists
+        levelKeys.push(levelEnd);
       }
 
       // Fetch scores for each key, prioritizing existing scores
@@ -146,7 +146,7 @@ function extractLevelsInfo() {
     return data
       .map(
         (row) =>
-          `{ Gr: ${row.Grade}, Sub: ${row.Subject}, Lvl: ${row.Level}, avg1: ${row.avgOne}, avg2: ${row.avgTwo} }`
+          `[ Gr: ${row.Grade}, Sub: ${row.Subject}, Lvl: ${row.Level}, avg1: ${row.avgOne}, avg2: ${row.avgTwo} ]`
       )
       .join("\n");
   };
@@ -158,12 +158,12 @@ function extractLevelsInfo() {
 
   SpreadsheetApp.getUi().alert(
     `Literacy Data\n\nPrimary\n${literacyStrPrimary}\n\nProgressive\n${
-      literacyStrProgressive ? literacyStrProgressive : "{ No Progressive Data Found }"
+      literacyStrProgressive ? literacyStrProgressive : "[ No Progressive Data Found ]"
     }`
   );
   SpreadsheetApp.getUi().alert(
     `Numeracy Data\n\nPrimary\n${numeracyStrPrimary}\n\nProgressive\n${
-      numeracyStrProgressive ? numeracyStrProgressive : "{ No Progressive Data Found }"
+      numeracyStrProgressive ? numeracyStrProgressive : "[ No Progressive Data Found ]"
     }`
   );
 

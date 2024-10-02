@@ -9,7 +9,10 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
   const FONT_SIZE = 8;
   const FONT_FAMILY = "Arial";
   const HEADER_BG_COLOR = "#efefef";
-  const FONT_COLOR = "#666666";
+  const DEFAULT_FONT_COLOR = "#666666";
+  const LOW_COLOR = "#990000"; // 0-39%
+  const MEDIUM_COLOR = "#e69138"; // 40-69%
+  const HIGH_COLOR = "#6aa84f"; // 70-100%
 
   let searchResult = body.findText(placeholder);
 
@@ -82,10 +85,13 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
 
       if (isNumeracy) {
         const lastYearMathCell = row.appendTableCell(item.Level);
-        row.appendTableCell(item.ItemAvg1);
-        row.appendTableCell(item.ItemAvg2);
+        const itemAvg1Cell = row.appendTableCell(item.ItemAvg1);
+        const itemAvg2Cell = row.appendTableCell(item.ItemAvg2);
         row.appendTableCell(item.RemediateLevel);
         row.appendTableCell(item.ProposedLevel);
+
+        applyPercentageColor(itemAvg1Cell, item.ItemAvg1, [LOW_COLOR, MEDIUM_COLOR, HIGH_COLOR]);
+        applyPercentageColor(itemAvg2Cell, item.ItemAvg2, [LOW_COLOR, MEDIUM_COLOR, HIGH_COLOR]);
 
         // Apply conditional formatting for math levels
         const mathColors = {
@@ -212,11 +218,14 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
       } else {
         const lastYearReadingCell = row.appendTableCell(item.LastYearReadingLevel);
         const lastYearLangCell = row.appendTableCell(item.LastYearLangLevel);
-        row.appendTableCell(item.ItemAvg1);
-        row.appendTableCell(item.ItemAvg2);
+        const itemAvg1Cell = row.appendTableCell(item.ItemAvg1);
+        const itemAvg2Cell = row.appendTableCell(item.ItemAvg2);
         row.appendTableCell(item.RemediateLevel);
         row.appendTableCell(item.ProposedReadingLevel);
         row.appendTableCell(item.ProposedLangLevel);
+
+        applyPercentageColor(itemAvg1Cell, item.ItemAvg1, [LOW_COLOR, MEDIUM_COLOR, HIGH_COLOR]);
+        applyPercentageColor(itemAvg2Cell, item.ItemAvg2, [LOW_COLOR, MEDIUM_COLOR, HIGH_COLOR]);
 
         // Apply conditional formatting for reading levels
         const readingColors = {
@@ -355,7 +364,14 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
       const cells = row.getNumCells();
       for (let j = 0; j < cells; j++) {
         const cell = row.getCell(j);
-        cell.setFontSize(FONT_SIZE).setFontFamily(FONT_FAMILY).setBold(false).setForegroundColor(FONT_COLOR);
+        const cellText = cell.getText();
+
+        cell.setFontSize(FONT_SIZE).setFontFamily(FONT_FAMILY).setBold(true);
+
+        // Check if the cell text does NOT contain a '%'
+        if (!cellText.includes("%")) {
+          cell.setBold(false).setForegroundColor(DEFAULT_FONT_COLOR); // Set color only for cells without '%'
+        }
       }
     }
 

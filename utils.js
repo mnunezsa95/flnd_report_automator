@@ -67,3 +67,39 @@ function convertGradeToShort(grade, mapping) {
 
   return grade;
 }
+
+function applyPercentageColor(cell, value, [LOW_COLOR, MEDIUM_COLOR, HIGH_COLOR]) {
+  const percentageValue = parseFloat(value.replace("%", ""));
+  const percentageSign = value.includes("%") ? "%" : ""; // Get the percentage sign
+
+  // Set the main text and the percentage sign
+  const percentageText = value.replace("%", ""); // Text without the %
+
+  if (!isNaN(percentageValue)) {
+    // Determine color based on percentage value
+    let color;
+    if (percentageValue <= 39) {
+      color = LOW_COLOR;
+    } else if (percentageValue <= 69) {
+      color = MEDIUM_COLOR;
+    } else if (percentageValue <= 100) {
+      color = HIGH_COLOR;
+    }
+
+    // Clear existing content and set new text
+    cell.setText(percentageText + percentageSign);
+
+    // Get the text object of the cell
+    const text = cell.getChild(0).asText();
+
+    // Apply color to the percentage text
+    text.setForegroundColor(0, percentageText.length - 1, color); // Color the percentage value
+
+    // Apply black color to the % sign
+    text.setForegroundColor(percentageText.length, percentageText.length, "#000000"); // Color for the %
+  } else {
+    // Reset to default if value is not a valid percentage
+    cell.setText(value); // Set the original value if invalid
+    cell.setForegroundColor("#000000"); // Default color (black)
+  }
+}

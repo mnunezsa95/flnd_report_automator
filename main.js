@@ -79,6 +79,6 @@ function main() {
     reportDatabaseTab.getRange(nextRow, 2, 1, outputData.length).setValues([outputData]);
 
     // Reset fields (optional)
-    // resetFields(constants.sheet, constants.row, [6, 7, 8]);
+    resetFields(constants.sheet, constants.row, [6, 7, 8, 9]);
   }
 }

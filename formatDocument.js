@@ -47,9 +47,8 @@ function formatDocument(newFileData) {
           const parent = element.getParent();
           const image = body.insertImage(body.getChildIndex(parent) + 1, imageBlob);
 
-          // Resize image based on content or page width
-          image.setWidth(400); // Adjust as needed
-          image.setHeight(300); // Adjust as needed
+          image.setWidth(400);
+          image.setHeight(300);
 
           element.asText().deleteText(start, end);
           imageResult = body.findText(placeholder, imageResult);

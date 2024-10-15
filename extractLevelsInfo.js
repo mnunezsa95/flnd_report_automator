@@ -48,7 +48,8 @@ function extractLevelsInfo() {
       subject === "Mathematics 1 & 2" ||
       subject === "Supplementary Numeracy" ||
       subject === "Accelerated Maths" ||
-      subject === "Supplementary Maths"
+      subject === "Supplementary Maths" ||
+      subject === "Preparatory Maths"
     ) {
       numeracyGrades.add(grade);
       numeracyData[category].push(formattedRow);
@@ -59,7 +60,8 @@ function extractLevelsInfo() {
       subject === "Literacy 1 & 2" ||
       subject === "English Studies - Language" ||
       subject === "English Studies - Reading 1 & 2" ||
-      subject === "Supplementary English 1 & 2"
+      subject === "Supplementary English 1 & 2" ||
+      subject === "Preparatory English 1 & 2"
     ) {
       literacyGrades.add(grade);
       literacyData[category].push(formattedRow);

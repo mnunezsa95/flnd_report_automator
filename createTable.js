@@ -95,6 +95,10 @@ function createTable(body, data, headers, isNumeracy, placeholder) {
 
         // Apply conditional formatting for math levels
         const mathColors = {
+          1: {
+            A: GREEN,
+            AA: GREEN,
+          },
           2: {
             A: LIGHT_YELLOW,
             AA: LIGHT_YELLOW,
